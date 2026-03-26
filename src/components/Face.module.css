@@ -1,0 +1,4 @@
+.image {
+	height: inherit;
+	object-fit: contain;
+}

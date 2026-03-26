@@ -1,8 +1,9 @@
+import styles from './Face.module.css';
+
 const Face = ({ photo }) => {
 	return (
 		<div>
-			<h1>{`${photo.name}, ${photo.age}`}</h1>
-			<img src={photo.url} alt={photo.name} />
+			<img src={photo.url} alt={photo.name} className={styles.image} />
 		</div>
 	);
 };

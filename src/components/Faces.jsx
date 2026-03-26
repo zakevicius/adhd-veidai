@@ -1,29 +1,39 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '../utils/supabase'
-import styles from './Faces.module.css'
+import { useState, useEffect } from 'react';
+import { supabase } from '../utils/supabase';
 
-import Face from './Face'
+import Face from './Face';
+import Info from './Info';
 
-export default function Faces() {
-  const [photos, setPhotos] = useState([])
+import styles from './Faces.module.css';
 
-  useEffect(() => {
-    async function getPhotos() {
-      const { data: photos } = await supabase.from('photos').select()
+import { VIEW_HOME } from '../utils/constants';
 
-      if (photos) {
-        setPhotos(photos)
-      }
-    }
+const Faces = ({ setView }) => {
+	const [photos, setPhotos] = useState([]);
 
-    getPhotos()
-  }, [])
+	useEffect(() => {
+		async function getPhotos() {
+			const { data: photos } = await supabase.from('photos').select();
 
-  return (
-    <main className={styles.faces}>
-        {photos.map((photo, index) => (
-          <Face key={index} photo={photo} />
-        ))}
-    </main>
-  )
-}
+			if (photos) {
+				setPhotos(photos);
+			}
+		}
+
+		getPhotos();
+	}, []);
+
+	return (
+		<div>
+			<button onClick={() => setView(VIEW_HOME)}> {'<<<'} </button>
+			{photos.map((photo, index) => (
+				<div className={styles.faces} key={index}>
+					<Face photo={photo} />
+					<Info photo={photo} />
+				</div>
+			))}
+		</div>
+	);
+};
+
+export default Faces;
