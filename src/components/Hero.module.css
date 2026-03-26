@@ -1,6 +1,5 @@
 .container {
 	width: 100%;
-	background-color: var(--color-black);
 	position: relative;
 }
 
@@ -22,5 +21,30 @@
 }
 
 .text h1 {
-	font-size: 6rem;
+	margin: 0;
+	padding: 0;
+	font-weight: 300;
+	text-shadow: 0.5cm 0.5cm 0.6cm var(--color-white);
+}
+
+.text h1:first-child {
+	font-size: 10rem;
+}
+
+.text h1:last-child {
+	transform: translate(17%, -20%);
+	color: var(--color-yellow);
+	font-size: 11rem;
+	text-shadow: 0.5cm 0.5cm 0.6cm var(--color-yellow);
+}
+
+.button {
+	border: none;
+	background-color: var(--color-black);
+	color: var(--color-yellow);
+	padding: 1rem 3rem;
+	font-size: 1rem;
+	font-weight: 300;
+	cursor: pointer;
+	letter-spacing: 0.3rem;
 }
