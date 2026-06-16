@@ -2,9 +2,13 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
+import Admin from './admin/Admin.jsx'
+
+// Tiny path-based switch: /admin shows the editor, everything else the gallery.
+const isAdmin = window.location.pathname.replace(/\/+$/, '') === '/admin'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    {isAdmin ? <Admin /> : <App />}
   </StrictMode>,
 )
