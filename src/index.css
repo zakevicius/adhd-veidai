@@ -25,7 +25,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   position: fixed; inset: 0; z-index: 60; background: var(--bg);
   display: flex; align-items: center; justify-content: center;
   padding: 34px; text-align: center;
-  transition: opacity .9s ease;
+  transition: opacity .45s ease;
 }
 .intro::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
@@ -53,30 +53,45 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .enter span { transition: transform .25s; }
 .enter:hover { border-color: var(--ink); }
 .enter:hover span { transform: translateX(5px); }
+.enter:disabled { cursor: default; opacity: .65; border-color: #3a3a40; }
+.enter .spinner {
+  width: 14px; height: 14px; border-radius: 50%; display: inline-block;
+  border: 2px solid rgba(244,242,238,.25); border-top-color: var(--ink);
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* viewport holds the horizontal track */
 .deck { position: fixed; inset: 0; overflow: hidden; touch-action: none; }
-.track { display: flex; height: 100%; will-change: transform; transition: transform .6s cubic-bezier(.7,0,.2,1); }
+/* one shared blurred backdrop of the current photo (desktop) — sits behind the
+   track and shows through the side gaps of the centred portrait */
+.deckbg { display: none; }
+.track { display: flex; height: 100%; will-change: transform; transition: transform .6s cubic-bezier(.7,0,.2,1); position: relative; z-index: 1; }
 .slide { position: relative; flex: 0 0 100%; height: 100%; overflow: hidden; background: #000; }
 
 .slide .photo { position: absolute; inset: 0; }
 .slide .photo img { position: absolute; inset: 0; transition: transform 1.2s ease; }
 .slide.open .photo img { transform: scale(1.03); }
-/* mobile (default): single full-bleed image; the blurred backdrop is unused */
-.slide .photo img.pbg { display: none; }
 
 /* desktop: portrait photos are taller than a landscape viewport. Show the
    portrait slightly zoomed (contain + a little scale, so it fills more and is
-   only just clipped top/bottom) over a heavily-blurred, full-brightness copy
-   of the same image that fills the side gaps. */
+   only just clipped top/bottom) over the heavily-blurred shared backdrop. */
 @media (min-width: 760px) {
-  .slide { background: var(--bg); }
+  .slide { background: transparent; }
+  .deckbg {
+    display: block; position: absolute; inset: 0; z-index: 0;
+    background-size: cover; background-position: center;
+    transform: scale(1.35); filter: blur(100px);
+    /* keep on a stable layer so the costly blur is rasterised up front (while
+       the intro is still showing) instead of hitching on reveal */
+    will-change: transform;
+  }
+  /* fade the new backdrop in over the swipe so it tracks the sliding photo */
+  .deckbg-cur { animation: bgfade .6s cubic-bezier(.7,0,.2,1) both; }
   .slide .photo img.pfg { object-fit: contain; transform: scale(1.18); }
   .slide.open .photo img.pfg { transform: scale(1.18); }
-  /* DIAGNOSTIC: backdrop disabled to confirm the blurred layer is the flicker
-     cause. If the flicker stops, we re-add the blur with a cheaper technique. */
-  .slide .photo img.pbg { display: none; }
 }
+@keyframes bgfade { from { opacity: 0; } to { opacity: 1; } }
 /* light bottom vignette so the name stays legible, kept low so it doesn't
    darken the bottom half of the photo (the .panel gradient covers the text) */
 .slide .veil {

@@ -1,12 +1,27 @@
-import { forwardRef } from 'react';
+import { forwardRef, useEffect, useRef } from 'react';
 import Photo from './Photo';
 
 const Deck = forwardRef(function Deck(
   { people, idx, isOpen, onPrev, onNext, onCloseStory },
   trackRef
 ) {
+  // Shared, heavily-blurred backdrop of the current photo (desktop only) — a
+  // couple of stable layers that never churn, unlike a blurred copy per slide
+  // (which forced a GPU layer each and flickered as they were evicted).
+  // Two layers crossfade over the swipe duration so the blur arrives in step
+  // with the sliding photo instead of snapping in early.
+  const srcOf = (p) => (p ? p.img || `https://i.pravatar.cc/900?img=${p.fb}` : null);
+  const curSrc = srcOf(people[idx]);
+  const prevIdxRef = useRef(idx);
+  const prevSrc = srcOf(people[prevIdxRef.current]);
+  useEffect(() => { prevIdxRef.current = idx; });
+
   return (
     <div className="deck">
+      {prevSrc && <div className="deckbg" style={{ backgroundImage: `url(${prevSrc})` }} />}
+      {curSrc && (
+        <div className="deckbg deckbg-cur" key={idx} style={{ backgroundImage: `url(${curSrc})` }} />
+      )}
       <div
         className="track"
         ref={trackRef}
@@ -15,8 +30,6 @@ const Deck = forwardRef(function Deck(
         {people.map((p, i) => (
           <div key={i} className={`slide${i === idx && isOpen ? ' open' : ''}`}>
             <div className="photo">
-              {/* desktop: heavily-blurred copy fills the gaps around the portrait */}
-              <Photo person={p} size={900} brightnessClass="pbg" />
               <Photo person={p} size={900} brightnessClass="pfg" />
             </div>
             <div className="veil" />
