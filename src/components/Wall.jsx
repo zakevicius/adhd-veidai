@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import Photo from './Photo';
 
 // only even spans so tiles tessellate with no gaps (2x2 acts as filler)
@@ -8,7 +8,7 @@ function randomSizes(count) {
   return Array.from({ length: count }, () => SIZES[Math.floor(Math.random() * SIZES.length)]);
 }
 
-export default function Wall({ people, show, onTile }) {
+function Wall({ people, show, onTile }) {
   const masonryRef = useRef(null);
 
   // assign a random tile size to each person once
@@ -64,3 +64,5 @@ export default function Wall({ people, show, onTile }) {
     </div>
   );
 }
+
+export default memo(Wall);

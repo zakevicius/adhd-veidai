@@ -91,6 +91,10 @@ export default function App() {
   }, [total]);
   const openStory = useCallback(() => setIsOpen(true), []);
   const closeStory = useCallback(() => setIsOpen(false), []);
+  // stable prev/next (read idx from the ref) so memoised Deck isn't re-rendered
+  // by unrelated parent updates like the intro spinner toggling
+  const goPrev = useCallback(() => go(stateRef.current.idx - 1), [go]);
+  const goNext = useCallback(() => go(stateRef.current.idx + 1), [go]);
 
   const changeView = useCallback((v) => {
     setView(v);
@@ -242,8 +246,8 @@ export default function App() {
         people={people}
         idx={idx}
         isOpen={isOpen}
-        onPrev={() => go(idx - 1)}
-        onNext={() => go(idx + 1)}
+        onPrev={goPrev}
+        onNext={goNext}
         onCloseStory={closeStory}
       />
 
