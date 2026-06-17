@@ -13,12 +13,11 @@ export default function App() {
   const total = people.length;
 
   // `ready` = people fetched and the first photo decoded. `pending` = the user
-  // pressed enter but we're still waiting (on `ready` and a short minimum so the
-  // spinner is always visible); the gallery only reveals once both are met, so
-  // it never appears to a blank frame and the press always gives feedback.
+  // pressed enter but we're still waiting on `ready`; the spinner shows only
+  // during that genuine wait (instant on a warm load), and the gallery reveals
+  // once ready so it never appears to a blank frame.
   const [ready, setReady] = useState(false);
   const [pending, setPending] = useState(false);
-  const [minDone, setMinDone] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -112,23 +111,15 @@ export default function App() {
 
   const enterGallery = useCallback(() => {
     if (stateRef.current.entered) return;
-    setPending(true); // reveal once ready + min spinner time (see effects below)
+    setPending(true); // reveal once the first photo is ready (see effect below)
   }, []);
 
-  // hold the spinner for a brief minimum so the press always reads as loading
+  // reveal once the first photo is ready. two steps: activate the gallery behind
+  // the still-opaque intro+spinner, let it paint for a couple of frames (so the
+  // blur backdrop is rasterised), then fade the intro out — so the gallery never
+  // reveals to a blank/hitching frame.
   useEffect(() => {
-    if (!pending) return;
-    setMinDone(false);
-    const t = setTimeout(() => setMinDone(true), 550);
-    return () => clearTimeout(t);
-  }, [pending]);
-
-  // reveal once the first photo is ready and the minimum spinner time elapsed.
-  // two steps: activate the gallery behind the still-opaque intro+spinner, let
-  // it paint for a couple of frames (so the blur backdrop is rasterised), then
-  // fade the intro out — so the gallery never reveals to a blank/hitching frame.
-  useEffect(() => {
-    if (!pending || !ready || !minDone) return;
+    if (!pending || !ready) return;
     setEntered(true);
     let raf2;
     const raf1 = requestAnimationFrame(() => {
@@ -140,7 +131,7 @@ export default function App() {
       });
     });
     return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
-  }, [pending, ready, minDone, showChrome]);
+  }, [pending, ready, showChrome]);
 
   // returns the current slide's scrollable story element
   const currentStory = useCallback(

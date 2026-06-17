@@ -30,7 +30,7 @@ const Deck = forwardRef(function Deck(
         {people.map((p, i) => (
           <div key={i} className={`slide${i === idx && isOpen ? ' open' : ''}`}>
             <div className="photo">
-              <Photo person={p} size={900} brightnessClass="pfg" />
+              <Photo person={p} size={900} className="pfg" />
             </div>
             <div className="veil" />
             <div className="panel">
