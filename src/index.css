@@ -32,10 +32,16 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   background: radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(0,0,0,.55));
 }
 .intro.gone { opacity: 0; pointer-events: none; }
-.intro-inner { position: relative; z-index: 1; max-width: 900px; animation: rise 1s ease both; }
+/* hold the title invisible until the webfont is ready, then run `rise` once
+   the real font is in place so its overhanging ink isn't clipped by the
+   composited layer (see Intro.jsx). */
+.intro-inner { position: relative; z-index: 1; max-width: 900px; opacity: 0; }
+.intro-inner.ready { animation: rise 1s ease both; }
 @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-.intro .kicker { font-size: 11px; letter-spacing: .36em; text-transform: uppercase; color: var(--accent); }
-.intro h1 { font-family: var(--font-serif); font-weight: 400; font-size: clamp(40px, 10.5vw, 124px); line-height: 1.05; margin: 4px 0 0; white-space: nowrap; }
+.intro .kicker { font-size: 11px; letter-spacing: .36em; text-transform: uppercase; color: var(--accent); margin: 12px 0; }
+/* extra line-height + padding gives the script font's high tittle and trailing
+   swash room so they aren't clipped; overflow:visible lets ink spill the box. */
+.intro h1 { font-family: var(--font-serif); font-weight: 400; font-size: clamp(40px, 10.5vw, 124px); line-height: 1.22; margin: 0; padding: .1em .12em 0; white-space: nowrap; overflow: visible; }
 .intro h1 span { color: var(--accent); }
 .intro p { color: var(--muted); font-size: 17px; line-height: 1.65; max-width: 440px; margin: 8px auto 40px; }
 .enter {
@@ -143,9 +149,8 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .brand { font-size: 11px; letter-spacing: .2em; }
   .viewtabs button { padding: 7px 11px; letter-spacing: .1em; }
   .counter { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); }
-  .ghint.label { font-size: 9px; letter-spacing: .14em; padding: 7px 12px; }
-  /* let the script title wrap to two lines so it stays large and dominant */
-  .intro h1 { white-space: normal; font-size: clamp(58px, 19vw, 92px); line-height: 1; }
+  /* keep the script title on one line, scaled up to fill the viewport width */
+  .intro h1 { white-space: nowrap; font-size: clamp(44px, 20vw, 96px); line-height: 1.18; }
 }
 
 /* side arrows (desktop affordance) */
@@ -239,11 +244,3 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .ghint.right { right: 16px; animation: nudgeR 1.7s ease-in-out infinite; }
 @keyframes nudgeL { 0%,100% { transform: translateY(-50%) translateX(0); opacity: .4; } 50% { transform: translateY(-50%) translateX(-7px); opacity: 1; } }
 @keyframes nudgeR { 0%,100% { transform: translateY(-50%) translateX(0); opacity: .4; } 50% { transform: translateY(-50%) translateX(7px); opacity: 1; } }
-.ghint.label {
-  top: auto; bottom: 224px; left: 50%; transform: translateX(-50%); white-space: nowrap;
-  font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase;
-  color: rgba(244,242,238,.66);
-  background: rgba(6,6,8,.38); padding: 8px 16px; border-radius: 999px;
-  backdrop-filter: blur(3px);
-  text-shadow: 0 1px 10px rgba(0,0,0,.9);
-}
