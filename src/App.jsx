@@ -12,6 +12,14 @@ export default function App() {
   const [people, setPeople] = useState([]);
   const total = people.length;
 
+  // `ready` = people fetched and the first photo decoded. `pending` = the user
+  // pressed enter but we're still waiting (on `ready` and a short minimum so the
+  // spinner is always visible); the gallery only reveals once both are met, so
+  // it never appears to a blank frame and the press always gives feedback.
+  const [ready, setReady] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [minDone, setMinDone] = useState(false);
+
   useEffect(() => {
     let alive = true;
     loadPeople().then((list) => {
@@ -20,7 +28,21 @@ export default function App() {
     return () => { alive = false; };
   }, []);
 
+  useEffect(() => {
+    if (!people.length) return;
+    const first = people[0];
+    const src = first.img || `https://i.pravatar.cc/900?img=${first.fb}`;
+    let alive = true;
+    const done = () => alive && setReady(true);
+    const img = new Image();
+    img.onload = done;
+    img.onerror = done;
+    img.src = src;
+    return () => { alive = false; };
+  }, [people]);
+
   const [entered, setEntered] = useState(false);
+  const [introGone, setIntroGone] = useState(false); // fades the intro out
   const [view, setView] = useState('deck');
   const [idx, setIdx] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -90,10 +112,35 @@ export default function App() {
 
   const enterGallery = useCallback(() => {
     if (stateRef.current.entered) return;
+    setPending(true); // reveal once ready + min spinner time (see effects below)
+  }, []);
+
+  // hold the spinner for a brief minimum so the press always reads as loading
+  useEffect(() => {
+    if (!pending) return;
+    setMinDone(false);
+    const t = setTimeout(() => setMinDone(true), 550);
+    return () => clearTimeout(t);
+  }, [pending]);
+
+  // reveal once the first photo is ready and the minimum spinner time elapsed.
+  // two steps: activate the gallery behind the still-opaque intro+spinner, let
+  // it paint for a couple of frames (so the blur backdrop is rasterised), then
+  // fade the intro out — so the gallery never reveals to a blank/hitching frame.
+  useEffect(() => {
+    if (!pending || !ready || !minDone) return;
     setEntered(true);
-    setTimeout(() => setHintsGone(true), 7000);
-    showChrome();
-  }, [showChrome]);
+    let raf2;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        setIntroGone(true);
+        setPending(false);
+        setTimeout(() => setHintsGone(true), 7000);
+        showChrome();
+      });
+    });
+    return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
+  }, [pending, ready, minDone, showChrome]);
 
   // returns the current slide's scrollable story element
   const currentStory = useCallback(
@@ -218,7 +265,7 @@ export default function App() {
       <div className={`ghint side left${hintsGone ? ' gone' : ''}`}>&#8249;</div>
       <div className={`ghint side right${hintsGone ? ' gone' : ''}`}>&#8250;</div>
 
-      <Intro entered={entered} onEnter={enterGallery} />
+      <Intro gone={introGone} onEnter={enterGallery} loading={pending} />
     </>
   );
 }
