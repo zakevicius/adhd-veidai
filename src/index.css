@@ -62,8 +62,6 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .slide .photo { position: absolute; inset: 0; }
 .slide .photo img { position: absolute; inset: 0; transition: transform 1.2s ease; }
 .slide.open .photo img { transform: scale(1.03); }
-/* placeholders: warm sepia monochrome to match real portraits */
-.slide .photo img.tone { filter: grayscale(1) sepia(.5) saturate(1.45) brightness(.82) contrast(1.05); }
 /* mobile (default): single full-bleed image; the blurred backdrop is unused */
 .slide .photo img.pbg { display: none; }
 
@@ -72,12 +70,15 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
    only just clipped top/bottom) over a heavily-blurred, full-brightness copy
    of the same image that fills the side gaps. */
 @media (min-width: 760px) {
+  .slide { background: var(--bg); }
   .slide .photo img.pfg { object-fit: contain; transform: scale(1.18); }
   .slide.open .photo img.pfg { transform: scale(1.18); }
-  .slide .photo img.pbg { display: block; object-fit: cover; transform: scale(1.6); filter: blur(120px); }
-  .slide .photo img.pbg.tone { filter: grayscale(1) sepia(.5) saturate(1.45) brightness(.82) contrast(1.05) blur(120px); }
+  /* DIAGNOSTIC: backdrop disabled to confirm the blurred layer is the flicker
+     cause. If the flicker stops, we re-add the blur with a cheaper technique. */
+  .slide .photo img.pbg { display: none; }
 }
-/* permanent bottom vignette so name is always legible */
+/* light bottom vignette so the name stays legible, kept low so it doesn't
+   darken the bottom half of the photo (the .panel gradient covers the text) */
 .slide .veil {
   position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(transparent 45%, rgba(6,6,8,.55) 78%, rgba(6,6,8,.9));
