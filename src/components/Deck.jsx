@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useRef } from 'react';
+import { forwardRef, memo, useEffect, useRef } from 'react';
 import Photo from './Photo';
 
 const Deck = forwardRef(function Deck(
@@ -71,4 +71,6 @@ const Deck = forwardRef(function Deck(
   );
 });
 
-export default Deck;
+// memoised so a parent re-render (e.g. the intro spinner toggling) doesn't
+// re-run the whole slide list — keeps the click→spinner paint instant
+export default memo(Deck);

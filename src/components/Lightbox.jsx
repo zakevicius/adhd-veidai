@@ -1,6 +1,7 @@
+import { memo } from 'react';
 import Photo from './Photo';
 
-export default function Lightbox({ person, onClose, onJump }) {
+function Lightbox({ person, onClose, onJump }) {
   function handleBackdrop(e) {
     if (e.target === e.currentTarget) onClose();
   }
@@ -29,3 +30,5 @@ export default function Lightbox({ person, onClose, onJump }) {
     </div>
   );
 }
+
+export default memo(Lightbox);
