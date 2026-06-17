@@ -50,6 +50,15 @@ export default function App() {
     setUiHidden(false);
     armHide();
   }, [armHide]);
+  // a tap toggles the chrome: hide it if visible, reveal (and re-arm auto-hide) if hidden
+  const toggleChrome = useCallback(() => {
+    setUiHidden((hidden) => {
+      const next = !hidden;
+      if (next) clearTimeout(hideTimer.current); // hiding now — cancel any pending auto-hide
+      else armHide();                            // revealing now — re-arm auto-hide
+      return next;
+    });
+  }, [armHide]);
 
   const go = useCallback((n) => {
     setIdx((cur) => {
@@ -152,7 +161,7 @@ export default function App() {
       if (s.view !== 'deck') return;
       const dx = e.clientX - sx, dy = e.clientY - sy;
       const ax = Math.abs(dx), ay = Math.abs(dy);
-      if (ax < 40 && ay < 40) { showChrome(); return; } // a tap reveals the chrome
+      if (ax < 40 && ay < 40) { toggleChrome(); return; } // a tap toggles the chrome
       if (ax > ay) {
         if (dx < 0) go(s.idx + 1); else go(s.idx - 1);
       } else {
@@ -170,7 +179,7 @@ export default function App() {
       removeEventListener('pointerup', onUp);
       removeEventListener('pointercancel', onCancel);
     };
-  }, [go, openStory, closeStory, currentStory, showChrome]);
+  }, [go, openStory, closeStory, currentStory, toggleChrome]);
 
   // reveal the chrome on genuine mouse movement (desktop hover) — never on swipe/scroll/keys
   useEffect(() => {
@@ -208,9 +217,6 @@ export default function App() {
 
       <div className={`ghint side left${hintsGone ? ' gone' : ''}`}>&#8249;</div>
       <div className={`ghint side right${hintsGone ? ' gone' : ''}`}>&#8250;</div>
-      <div className={`ghint label${hintsGone ? ' gone' : ''}`}>
-        &#8249; braukite į šonus, kad pamatytumėte kitus &#8250;
-      </div>
 
       <Intro entered={entered} onEnter={enterGallery} />
     </>
