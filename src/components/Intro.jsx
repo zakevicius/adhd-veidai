@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 
 export default function Intro({ gone, onEnter, loading = false }) {
-  // Italianno is a script font whose glyphs (the dot of the "i", trailing
-  // swashes) overhang their box. The `rise` transform composites .intro-inner
-  // into a GPU layer that gets rasterised once; if that happens before the
-  // webfont settles, the overhanging ink is clipped and never repainted
-  // (notably on mobile, until a resize). Gate the animation on fonts being
-  // ready so the layer is rasterised with the real font in place.
+  // The `rise` transform composites .intro-inner into a GPU layer that gets
+  // rasterised once; if that happens before the webfont settles, the title can
+  // be rasterised in the fallback face and never repainted (notably on mobile,
+  // until a resize). Gate the animation on fonts being ready so the layer is
+  // rasterised with the real font in place.
   const [fontsReady, setFontsReady] = useState(false);
   useEffect(() => {
     let alive = true;
