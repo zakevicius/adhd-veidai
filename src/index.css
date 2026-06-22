@@ -42,7 +42,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .intro .kicker { font-size: 11px; letter-spacing: .36em; text-transform: uppercase; color: var(--accent); margin: 12px 0; }
 /* extra line-height + padding gives the script font's high tittle and trailing
    swash room so they aren't clipped; overflow:visible lets ink spill the box. */
-.intro h1 { font-family: var(--font-serif); font-weight: 400; font-size: clamp(40px, 10.5vw, 124px); line-height: 1.22; margin: 0; padding: .1em .12em 0; white-space: nowrap; overflow: visible; }
+.intro h1 { font-family: var(--font-serif); font-weight: 400; font-size: clamp(34px, 6.5vw, 78px); line-height: 1.22; margin: 0; padding: .1em .12em 0; white-space: nowrap; overflow: visible; }
 .intro h1 span { color: var(--accent); }
 .intro p { color: var(--muted); font-size: 17px; line-height: 1.65; max-width: 440px; margin: 8px auto 40px; }
 .enter {
@@ -61,6 +61,67 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   animation: spin .7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- 3D ring carousel (the "Istorijos" browse view) ---- */
+/* sits below the top bar (z-1) so the view tabs stay visible while browsing */
+.ring-root { position: fixed; inset: 0; z-index: 1; overflow: hidden; touch-action: none; }
+/* the stage is scaled (JS, viewport-relative) AFTER the 3D projection, so the
+   whole arc grows/shrinks to fill the width without crowding the cards */
+.ring-stage { position: absolute; inset: 0; transform-origin: 50% 50%; }
+.ring-view { position: absolute; inset: 0; perspective: 1300px; perspective-origin: 50% 50%; }
+/* zero-size point at the centre; the cards orbit it in 3D */
+.rring { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; }
+
+.rcard {
+  position: absolute; left: 50%; top: 50%;
+  width: 212px; height: 286px; margin: -143px 0 0 -106px;
+  border: 0; padding: 0; border-radius: 10px; overflow: hidden;
+  background: #15100b; color: inherit; cursor: pointer;
+  backface-visibility: hidden;
+  box-shadow: 0 30px 60px -22px rgba(0,0,0,.75);
+  transition: transform .6s cubic-bezier(.55,0,.2,1), opacity .6s cubic-bezier(.55,0,.2,1);
+}
+.rcard img { width: 100%; height: 100%; object-fit: cover; }
+/* non-focused cards get the standard dim sepia treatment */
+.rcard img { filter: grayscale(1) sepia(.5) saturate(1.45) brightness(.6) contrast(1.05); transition: filter .6s; }
+.rcard.focused img { filter: none; }
+.rcard.focused { box-shadow: 0 40px 80px -20px rgba(0,0,0,.85); }
+.rcard-veil { position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: linear-gradient(transparent 48%, rgba(6,6,8,.55) 74%, rgba(6,6,8,.92)); }
+.rcard.focused .rcard-veil { opacity: 1; }
+.rcard-meta { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 16px 16px; text-align: left; pointer-events: none; }
+.rcard-meta h3 { font-family: var(--font-serif); font-weight: 400; font-size: 15px; line-height: 1.05; margin: 0; }
+.rcard-age { color: var(--muted); font-size: 9px; letter-spacing: .04em; margin-top: 4px; }
+
+/* on-screen spin buttons (kept on touch + desktop) */
+.ring-nav {
+  position: fixed; top: 50%; transform: translateY(-50%); z-index: 250;
+  width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255,255,255,.18);
+  background: rgba(10,10,12,.4); color: var(--ink); font-size: 20px; line-height: 1;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  backdrop-filter: blur(4px); transition: .2s;
+}
+.ring-nav:hover { background: rgba(20,20,24,.65); }
+.ring-nav.prev { left: 18px; }
+.ring-nav.next { right: 18px; }
+@media (max-width: 620px) {
+  .ring-nav { width: 40px; height: 40px; } .ring-nav.prev { left: 8px; } .ring-nav.next { right: 8px; }
+}
+
+/* ---- full-screen story overlay (the deck), opened from a ring card ---- */
+.story-overlay { position: fixed; inset: 0; z-index: 70; }
+.story-close {
+  position: fixed; top: 16px; right: 20px; z-index: 80;
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,.2);
+  background: rgba(10,10,12,.45); color: var(--ink); font-size: 26px; line-height: 1;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  backdrop-filter: blur(6px); transition: .2s;
+}
+.story-close:hover { background: rgba(20,20,24,.72); }
+
+@media (prefers-reduced-motion: reduce) {
+  .rcard { transition: opacity .2s linear; }
+}
 
 /* viewport holds the horizontal track */
 .deck { position: fixed; inset: 0; overflow: hidden; touch-action: none; }
@@ -115,7 +176,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 }
 
 .kicker { font-size: 11px; letter-spacing: .34em; text-transform: uppercase; color: var(--accent); }
-.panel h2 { font-family: var(--font-serif); font-weight: 400; font-size: clamp(46px, 10vw, 68px); line-height: 1.1; margin: 14px 0 10px; }
+.panel h2 { font-family: var(--font-serif); font-weight: 400; font-size: clamp(32px, 6.5vw, 46px); line-height: 1.1; margin: 14px 0 10px; }
 .panel .age { color: var(--muted); font-size: 14px; letter-spacing: .02em; }
 
 /* collapsed hint */
@@ -179,7 +240,7 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .viewtabs button { padding: 7px 11px; letter-spacing: .1em; }
   .counter { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); }
   /* keep the script title on one line, scaled up to fill the viewport width */
-  .intro h1 { white-space: nowrap; font-size: clamp(44px, 20vw, 96px); line-height: 1.18; }
+  .intro h1 { white-space: nowrap; font-size: clamp(30px, 12vw, 58px); line-height: 1.18; }
 }
 
 /* side arrows (desktop affordance) */

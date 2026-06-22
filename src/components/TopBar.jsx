@@ -5,8 +5,8 @@ export default function TopBar({ view, onView, hidden }) {
       <div className="viewtabs">
         <button
           type="button"
-          className={view === 'deck' ? 'active' : ''}
-          onClick={() => onView('deck')}
+          className={view === 'ring' ? 'active' : ''}
+          onClick={() => onView('ring')}
         >
           Istorijos
         </button>
