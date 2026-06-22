@@ -2,7 +2,7 @@
 .admin {
   position: fixed; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
   background: var(--bg); color: var(--ink);
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-sans);
 }
 .admin-wrap { max-width: 920px; margin: 0 auto; padding: 32px 22px 80px; }
 

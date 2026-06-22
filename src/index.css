@@ -3,7 +3,8 @@
   --ink: #f4f2ee;
   --muted: #a09b94;
   --accent: #e8a36b;
-  --font-serif: 'Italianno', cursive;
+  --font-serif: 'Libre Baskerville', Georgia, serif;
+  --font-sans: 'Work Sans', 'Helvetica Neue', Arial, sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -14,7 +15,7 @@ html, body, #root {
   overscroll-behavior: none;
   background: var(--bg);
   color: var(--ink);
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
