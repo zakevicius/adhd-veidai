@@ -125,9 +125,6 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 /* viewport holds the horizontal track */
 .deck { position: fixed; inset: 0; overflow: hidden; touch-action: none; }
-/* one shared blurred backdrop of the current photo (desktop) — sits behind the
-   track and shows through the side gaps of the centred portrait */
-.deckbg { display: none; }
 .track { display: flex; height: 100%; will-change: transform; transition: transform .6s cubic-bezier(.7,0,.2,1); position: relative; z-index: 1; }
 .slide { position: relative; flex: 0 0 100%; height: 100%; overflow: hidden; background: #000; }
 
@@ -135,25 +132,12 @@ img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .slide .photo img { position: absolute; inset: 0; transition: transform 1.2s ease; }
 .slide.open .photo img { transform: scale(1.03); }
 
-/* desktop: portrait photos are taller than a landscape viewport. Show the
-   portrait slightly zoomed (contain + a little scale, so it fills more and is
-   only just clipped top/bottom) over the heavily-blurred shared backdrop. */
+/* desktop: portrait photos are taller than a landscape viewport — show the whole
+   portrait (contain, slightly zoomed) on the plain dark slide background. */
 @media (min-width: 760px) {
-  .slide { background: transparent; }
-  .deckbg {
-    display: block; position: absolute; inset: 0; z-index: 0;
-    background-size: cover; background-position: center;
-    transform: scale(1.35); filter: blur(100px);
-    /* keep on a stable layer so the costly blur is rasterised up front (while
-       the intro is still showing) instead of hitching on reveal */
-    will-change: transform;
-  }
-  /* fade the new backdrop in over the swipe so it tracks the sliding photo */
-  .deckbg-cur { animation: bgfade .6s cubic-bezier(.7,0,.2,1) both; }
   .slide .photo img.pfg { object-fit: contain; transform: scale(1.18); }
   .slide.open .photo img.pfg { transform: scale(1.18); }
 }
-@keyframes bgfade { from { opacity: 0; } to { opacity: 1; } }
 /* light bottom vignette so the name stays legible, kept low so it doesn't
    darken the bottom half of the photo (the .panel gradient covers the text) */
 .slide .veil {
